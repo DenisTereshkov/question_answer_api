@@ -32,3 +32,14 @@ def test_get_question(client):
     assert data["id"] == question_id
     assert data["text"] == "Какая высота Эвереста?"
 
+
+def test_get_different_question_text(client):
+    question_data = {"text": "Другой текст вопроса"}
+    create_response = client.post("/questions/", json=question_data)
+    question_id = create_response.json()["id"]
+    response = client.get(f"/questions/{question_id}")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["text"] == "Другой текст вопроса", (
+        f"Ожидали 'Другой текст вопроса', но получили '{data['text']}'"
+    )
