@@ -1,13 +1,18 @@
 from datetime import datetime
-from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class QuestionCreate(BaseModel):
-    text: str
+    text: str = Field(
+        ...,
+        min_length=1,
+        max_length=2000,
+        description="Текст вопроса"
+    )
+
 
 class Question(BaseModel):
-    id: int
-    text: str  
-    created_at: datetime
+    id: int = Field(..., description="ID вопроса")
+    text: str = Field(..., description="Текст вопроса")
+    created_at: datetime = Field(..., description="Дата создания")

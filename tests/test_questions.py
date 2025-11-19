@@ -9,3 +9,12 @@ def test_create_question(client):
     assert data["text"] == "Какая высота Эвереста?"
     assert "id" in data
     assert "created_at" in data
+
+
+def test_create_question_empty_text(client):
+    question_data = {"text": ""}
+    response = client.post("/questions/", json=question_data)
+    assert response.status_code == 422, (
+        f"Ожидаемый статус 422, но получили {response.status_code}. "
+        f"Тело ответа: {response.text}"
+    )
