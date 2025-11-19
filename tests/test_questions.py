@@ -18,3 +18,17 @@ def test_create_question_empty_text(client):
         f"Ожидаемый статус 422, но получили {response.status_code}. "
         f"Тело ответа: {response.text}"
     )
+
+
+def test_get_question(client):
+    question_data = {"text": "Какая высота Эвереста?"}
+    create_response = client.post("/questions/", json=question_data)
+    question_id = create_response.json()["id"]
+    response = client.get(f"/questions/{question_id}")
+    assert response.status_code == 200, (
+        f"Ожидаемый статус 200, но получили {response.status_code}"
+    )
+    data = response.json()
+    assert data["id"] == question_id
+    assert data["text"] == "Какая высота Эвереста?"
+
