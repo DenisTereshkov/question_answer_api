@@ -15,3 +15,13 @@ def create_question(question: QuestionCreate):
         text=question.text,
         created_at=datetime.now()
     )
+
+
+@router.get("/{question_id}", response_model=Question)
+def get_question(question_id: int):
+    # Hardcode
+    return Question(
+        id=question_id,
+        text="Какая высота Эвереста?",
+        created_at=datetime.now()
+    )
