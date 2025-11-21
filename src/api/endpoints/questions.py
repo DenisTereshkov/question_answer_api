@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from src.core.db import get_db
 from src.schemas.question import QuestionCreate, Question
@@ -38,3 +40,13 @@ def get_question(
         text=db_question.text,
         created_at=db_question.created_at
     )
+
+
+@router.get("/", response_model=list[Question])
+def get_all_questions(db: Session = Depends(get_db)):
+    try:
+        stmt = select(QuestionModel).order_by(QuestionModel.created_at.desc())
+        questions = db.scalars(stmt).all()
+        return questions
+    except SQLAlchemyError:
+        raise HTTPException(status_code=500, detail="Database error")
