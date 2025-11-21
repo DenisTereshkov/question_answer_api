@@ -51,3 +51,23 @@ def get_all_questions(db: Session = Depends(get_db)):
         return questions
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error")
+
+
+@router.delete("/{question_id}")
+def delete_question(
+    question_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        stmt = select(QuestionModel).where(QuestionModel.id == question_id)
+        db_question = db.scalar(stmt)
+        if not db_question:
+            raise HTTPException(
+                status_code=404, detail="Вопрос не найден"
+            )
+        db.delete(db_question)
+        db.commit()
+        return {"message": "Вопрос удален успешно"}
+    except SQLAlchemyError:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Database error")
