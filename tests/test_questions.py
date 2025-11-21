@@ -56,3 +56,14 @@ def test_get_all_questions(client):
     assert len(questions) >= 2
     assert any(q["text"] == "Первый вопрос" for q in questions)
     assert any(q["text"] == "Второй вопрос" for q in questions)
+
+
+def test_delete_question(client):
+    question_data = {"text": "Вопрос на удаление"}
+    create_response = client.post("/questions/", json=question_data)
+    question_id = create_response.json()["id"]
+    delete_response = client.delete(f"/questions/{question_id}")
+    assert delete_response.status_code == 200
+    assert delete_response.json()["message"] == "Вопрос удален успешно"
+    get_response = client.get(f"/questions/{question_id}")
+    assert get_response.status_code == 404
