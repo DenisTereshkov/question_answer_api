@@ -43,3 +43,16 @@ def test_get_different_question_text(client):
     assert data["text"] == "Другой текст вопроса", (
         f"Ожидали 'Другой текст вопроса', но получили '{data['text']}'"
     )
+
+
+def test_get_all_questions(client):
+    question1_data = {"text": "Первый вопрос"}
+    question2_data = {"text": "Второй вопрос"}
+    client.post("/questions/", json=question1_data)
+    client.post("/questions/", json=question2_data)
+    response = client.get("/questions/")
+    assert response.status_code == 200
+    questions = response.json()
+    assert len(questions) >= 2
+    assert any(q["text"] == "Первый вопрос" for q in questions)
+    assert any(q["text"] == "Второй вопрос" for q in questions)
