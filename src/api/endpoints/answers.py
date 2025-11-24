@@ -10,7 +10,7 @@ from src.models.question import Question as QuestionModel
 router = APIRouter()
 
 
-@router.post("/questions/{question_id}/answers/", response_model=Answer) в конце
+@router.post("/questions/{question_id}/answers/", response_model=Answer)
 def create_answer(
     question_id: int,
     answer: AnswerCreate,
