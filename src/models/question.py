@@ -11,4 +11,4 @@ class Question(Base):
     id = Column(Integer, primary_key=True, index=True)
     text = Column(String(1000), nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    answers = relationship("Answer", back_populates="question", cascade="all, delete_orphan")
+    answers = relationship("Answer", back_populates="question", cascade="all, delete-orphan")
