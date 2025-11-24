@@ -67,3 +67,8 @@ def test_delete_question(client):
     assert delete_response.json()["message"] == "Вопрос удален успешно"
     get_response = client.get(f"/questions/{question_id}")
     assert get_response.status_code == 404
+
+
+def test_get_not_existing_question(client):
+    response = client.get("/questions/999999999")
+    assert response.status_code == 404
