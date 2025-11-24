@@ -15,6 +15,5 @@ main_router.include_router(
 
 main_router.include_router(
     answers_router,
-    prefix="/answers",
     tags=["Ответы"],
 )

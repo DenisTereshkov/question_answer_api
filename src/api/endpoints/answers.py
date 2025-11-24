@@ -10,7 +10,7 @@ from src.models.question import Question as QuestionModel
 router = APIRouter()
 
 
-@router.post("/questions/{question_id}/answers", response_model=Answer)
+@router.post("/questions/{question_id}/answers/", response_model=Answer) в конце
 def create_answer(
     question_id: int,
     answer: AnswerCreate,
@@ -18,9 +18,10 @@ def create_answer(
 ):
     try:
         question_stmt = select(QuestionModel).where(QuestionModel.id == question_id)
-        question =db.scalar(question_stmt)
+        question = db.scalar(question_stmt)
         if not question:
             raise HTTPException(status_code=404, detail="Question not found")
+        
         db_answer = AnswerModel(
             text=answer.text,
             user_id=answer.user_id,
@@ -34,24 +35,11 @@ def create_answer(
         db.rollback()
         raise HTTPException(status_code=400, detail="Invalid data")
     except SQLAlchemyError:
-
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
 
-@router.get("/questions/{question_id}/answers", response_model=list[Answer])
-def get_answers(
-    question_id: int,
-    db: Session = Depends(get_db),
-):
-    try:
-        answer_stmt = select(AnswerModel).where(AnswerModel.question_id == question_id)
-        answers = db.scalars(answer_stmt).all()
-        return answers
-    except SQLAlchemyError:
-        raise HTTPException(status_code=500, detail="Database error")
 
-
-@router.get("/questions/{question_id}/answers/{answer_id}", response_model=Answer)
+@router.get("/questions/{question_id}/answers/{answer_id}/", response_model=Answer)
 def get_answer(
     question_id: int,
     answer_id: int,
@@ -59,8 +47,8 @@ def get_answer(
 ):
     try:
         answer_stmt = select(AnswerModel).where(
-            AnswerModel.question_id == question_id,
             AnswerModel.id == answer_id,
+            AnswerModel.question_id == question_id
         )
         answer = db.scalar(answer_stmt)
         if not answer:
@@ -70,7 +58,7 @@ def get_answer(
         raise HTTPException(status_code=500, detail="Database error")
 
 
-@router.delete("/questions/{question_id}/answers/{answer_id}")
+@router.delete("/questions/{question_id}/answers/{answer_id}/")
 def delete_answer(
     question_id: int,
     answer_id: int,
@@ -78,8 +66,8 @@ def delete_answer(
 ):
     try:
         answer_stmt = select(AnswerModel).where(
-            AnswerModel.question_id == question_id,
             AnswerModel.id == answer_id,
+            AnswerModel.question_id == question_id
         )
         answer = db.scalar(answer_stmt)
         if not answer:
@@ -89,4 +77,22 @@ def delete_answer(
         return {"message": "Answer deleted successfully"}
     except SQLAlchemyError:
         db.rollback()
+        raise HTTPException(status_code=500, detail="Database error")
+
+@router.get("/questions/{question_id}/answers/", response_model=list[Answer])
+def get_answers(
+    question_id: int,
+    db: Session = Depends(get_db),
+):
+    try:
+        question_stmt = select(QuestionModel).where(QuestionModel.id == question_id)
+        question = db.scalar(question_stmt)
+        if not question:
+            raise HTTPException(status_code=404, detail="Question not found")
+        answer_stmt = select(AnswerModel).where(AnswerModel.question_id == question_id)
+        answers = db.scalars(answer_stmt).all()
+        return answers
+    except HTTPException:
+        raise
+    except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error")

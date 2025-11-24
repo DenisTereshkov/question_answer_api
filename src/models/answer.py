@@ -7,7 +7,8 @@ class Answer(Base):
     __tablename__ = "answers"
 
     id = Column(Integer, primary_key=True, index=True)
-    text = Column(String(255), nullable=False)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    text = Column(String(1000), nullable=False)
+    user_id = Column(String(255), nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     question_id = Column(Integer, ForeignKey("questions.id", ondelete="CASCADE"), nullable=False)
     question = relationship("Question", back_populates="answers")
