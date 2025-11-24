@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.post("/questions/{question_id}/answers", response_model=Answer)
-async def create_answer(
+def create_answer(
     question_id: int,
     answer: AnswerCreate,
     db: Session = Depends(get_db),
