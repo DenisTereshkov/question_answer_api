@@ -72,3 +72,22 @@ def test_delete_question(client):
 def test_get_not_existing_question(client):
     response = client.get("/questions/999999999")
     assert response.status_code == 404
+
+
+def test_get_question_with_answers(client):
+    question_data = {"text": "Вопрос с ответами"}
+    question_response = client.post("/questions/", json=question_data)
+    question_id = question_response.json()["id"]
+    answer_data_1 = {"text": "Ответ 1", "user_id": "user-1"}
+    answer_data_2 = {"text": "Ответ 2", "user_id": "user-2"}
+    client.post(f"/questions/{question_id}/answers/", json=answer_data_1)
+    client.post(f"/questions/{question_id}/answers/", json=answer_data_2)    
+    response = client.get(f"/questions/{question_id}")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["id"] == question_id
+    assert data["text"] == "Вопрос с ответами"
+    assert "answers" in data
+    assert len(data["answers"]) == 2
+    assert data["answers"][0]["text"] == "Ответ 1"
+    assert data["answers"][1]["text"] == "Ответ 2"
