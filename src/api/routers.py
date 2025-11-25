@@ -1,9 +1,6 @@
 from fastapi import APIRouter
 
-from .endpoints import (
-    questions_router,
-    answers_router
-)
+from .endpoints import answers_router, questions_router
 
 main_router = APIRouter()
 

@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
+
 from src.core.db import get_db
-from src.schemas.question import QuestionCreate, Question
 from src.models.question import Question as QuestionModel
+from src.schemas.question import Question, QuestionCreate, QuestionWithAnswers
 
 router = APIRouter()
 
@@ -28,20 +29,26 @@ def create_question(
         raise HTTPException(status_code=500, detail="Database error")
 
 
-@router.get("/{question_id}", response_model=Question)
+@router.get("/{question_id}", response_model=QuestionWithAnswers)
 def get_question(
     question_id: int,
     db: Session = Depends(get_db)
 ):
     try:
-        stmt = select(QuestionModel).where(QuestionModel.id == question_id)
-        db_question = db.scalar(stmt)
-        if not db_question:
+        from sqlalchemy.orm import joinedload
+        stmt = (
+            select(QuestionModel)
+            .where(QuestionModel.id == question_id)
+            .options(joinedload(QuestionModel.answers))
+        )
+        question = db.scalar(stmt)
+        if not question:
             raise HTTPException(status_code=404, detail="Question not found")
-        return db_question
+        
+        # Конвертируем в схему с ответами
+        return QuestionWithAnswers.model_validate(question)
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error")
-
 
 @router.get("/", response_model=list[Question])
 def get_all_questions(db: Session = Depends(get_db)):

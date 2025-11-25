@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
+
 from src.core.db import get_db
-from src.schemas.answer import AnswerCreate, Answer
 from src.models.answer import Answer as AnswerModel
 from src.models.question import Question as QuestionModel
+from src.schemas.answer import Answer, AnswerCreate
 
 router = APIRouter()
 

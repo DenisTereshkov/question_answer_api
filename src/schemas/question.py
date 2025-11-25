@@ -1,5 +1,7 @@
-from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
+from typing import List
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class QuestionCreate(BaseModel):
@@ -11,3 +13,12 @@ class Question(BaseModel):
     id: int
     text: str
     created_at: datetime
+
+
+class QuestionWithAnswers(Question):
+    answers: List['Answer'] = []
+
+
+from .answer import Answer  # noqa
+
+QuestionWithAnswers.model_rebuild()

@@ -1,5 +1,7 @@
 from datetime import datetime
-from pydantic import BaseModel, Field, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, Field
+
 
 class AnswerCreate(BaseModel):
     text: str = Field(..., min_length=1, max_length=1000)
